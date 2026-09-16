@@ -3,7 +3,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-REDIS_HOST = os.getenv("REDIS_HOST", "redis")
+REDIS_HOST = os.getenv("REDIS_URL", "redis")
+
 if REDIS_HOST == "redis":
     redis_client = redis.asyncio.Redis(host=REDIS_HOST,port=6379, db=0, decode_responses=True)
 else:
