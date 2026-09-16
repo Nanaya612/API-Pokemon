@@ -1,0 +1,72 @@
+name: API-check-and-deploy
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Check código
+              uses: actions/checkout@v4
+
+            - name: Instalar Python 3.14
+              uses: actions/setup-python@v5
+              with:
+                python-version: '3.14'
+
+            - name: Instalar Poetry
+              run: pip install poetry
+
+            - name: Instalar dependências do projeto
+              run: poetry install --no-root --no-interaction
+
+            - name: Build imagem Docker
+              run: docker build -t fastapi-app:latest . 
+
+            - name: Rodar imagem Docker
+              run: docker run -d -p 8000:8000 --name api-container fastapi-app:latest
+      
+    tests:
+        runs-on: ubuntu-latest
+        needs: build
+
+        steps:
+            - name: Check código
+              uses: actions/checkout@v4
+
+            - name: Instalar Python 3.14
+              uses: actions/setup-python@v5
+              with:
+                python-version: '3.14'
+
+            - name: Instalar Poetry
+              run: pip install poetry
+
+            - name: Instalar dependências do projeto
+              run: poetry install --no-root --no-interaction
+
+            - name: Executar Testes da aplicação com Pytest
+              run: poetry run pytest
+
+            - name: Conferir coverage
+              run: poetry run pytest --cov=.
+
+    deploy:
+        runs-on: ubuntu-latest
+        needs: tests
+
+        steps:
+            - name: Check código
+              uses: actions/checkout@v4
+            
+            - name: Render deploy
+              run: |
+                curl -opt \
+                "$RENDER_DEPLOY_HOOK_URL"
