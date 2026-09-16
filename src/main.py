@@ -59,12 +59,12 @@ async def get_pokemon_id(id: int):
 
 # ENDPOINT para desenvilvimento. Mostra os itens no cache atual do redis
 
-# @App.get("/cache/debug")
-# async def ver_cache():
-#   chaves = await redis_client.keys("pokemon:*")
-#    Pokemons = []
-#    for chave in chaves:
-#        valor = await redis_client.get(chave)
-#        ttl = await redis_client.ttl(chave)
-#        Pokemons.append({"chave": chave, "valor": json.loads(valor), "ttl": ttl})
-#    return Pokemons
+@App.get("/cache/debug")
+async def ver_cache():
+    chaves = await redis_client.keys("pokemon:*")
+    Pokemons = []
+    for chave in chaves:
+        valor = await redis_client.get(chave)
+        ttl = await redis_client.ttl(chave)
+        Pokemons.append({"chave": chave, "valor": json.loads(valor), "ttl": ttl})
+    return Pokemons
