@@ -68,5 +68,4 @@ jobs:
             
             - name: Render deploy
               run: |
-                curl -opt \
-                "$RENDER_DEPLOY_HOOK_URL"
+                curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
