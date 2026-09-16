@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  app:
+    build: . 
+    container_name: api-container
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app:Z
+    working_dir: /app
+    command: ["poetry","run","uvicorn","src.main:App","--host","0.0.0.0","--port", "8000"]
+
+  redis:
+    image: redis:alpine
+    container_name: redis-container
+    ports:
+      - "6379:6379"
