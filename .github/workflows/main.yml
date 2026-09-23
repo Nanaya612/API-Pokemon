@@ -1,0 +1,62 @@
+name: API-check
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+
+jobs:
+    ci-pipeline:
+        runs-on: ubuntu-latest
+        env:
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          DATABASE_URL: "mysql+pymysql://root:${{ secrets.MYSQL_ROOT_PASSWORD }}@127.0.0.1:3306/${{ secrets.MYSQL_DATABASE }}"
+          REDIS_URL: "redis://127.0.0.1:6379/0"
+        services:
+          mysql:
+            image: mysql:8.0
+            env:
+              MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+              MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+            ports:
+              - 3306:3306
+            options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+          redis:
+            image: redis:alpine
+            ports:
+              - 6379:6379
+            options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        steps:
+            - name: Check código
+              uses: actions/checkout@v4
+
+            - name: Instalar Python 3.14
+              uses: actions/setup-python@v5
+              with:
+                python-version: '3.14'
+
+            - name: Instalar Poetry
+              run: pip install poetry
+
+            - name: Instalar dependências do projeto
+              run: poetry install --no-root --no-interaction
+
+            - name: Build imagem Docker
+              run: docker build -t fastapi-app:latest . 
+
+            - name: Rodar imagem Docker
+              run: |
+                docker run -d --network host --name api-container \
+                -e MYSQL_DATABASE="$MYSQL_DATABASE" \
+                -e MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
+                -e DATABASE_URL="$DATABASE_URL" \
+                -e REDIS_URL="$REDIS_URL" \
+                fastapi-app:latest
+            
+            - name: Executar Testes da aplicação com Pytest
+              run: poetry run pytest --cov=.
