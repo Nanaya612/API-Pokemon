@@ -26,7 +26,7 @@
 
 ## 4. Acessos:
 <p style="font-size: 15px;">Caso você tenha instalado a API e feito o passo a passo você pode acessar os endpoints como o <code>http://127.0.0.1:8000/pokemons</code> para retornar a lista de pokemons no banco de dados. Recomendo acessar o endpoint <code>http://127.0.0.1:8000/docs</code> para a documentação da API e seus endpoints.
-<p style="font-size: 15px;">Outra alternativa é acessar o link do deploy da API: "placeholder"</p>
+<p style="font-size: 15px;">Outra alternativa é acessar o link do deploy da API: https://pokemonapi-yhuu.onrender.com</p>
 
 _para parar os serviços da api localmente utilize `podman-compose stop` ou `docker-compose stop` e para desligar e apagar os containers utilize `podman-compose down` ou `docker-compose down`_
 
